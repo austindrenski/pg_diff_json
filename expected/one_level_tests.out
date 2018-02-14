@@ -1,0 +1,70 @@
+-- one-level tests
+
+\echo 'one-level test (identity)'
+one-level test (identity)
+SELECT jsonb_diff($${
+  "a": 0,
+  "b": 1
+}$$, $${
+  "a": 0,
+  "b": 1
+}$$);
+ERROR:  function jsonb_diff(unknown, unknown) does not exist
+LINE 1: SELECT jsonb_diff($${
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+\echo 'one-level test (delete)'
+one-level test (delete)
+SELECT jsonb_diff($${
+  "a": 0,
+  "b": 1
+}$$, $${
+  "a": 0
+}$$);
+ERROR:  function jsonb_diff(unknown, unknown) does not exist
+LINE 1: SELECT jsonb_diff($${
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+\echo 'one-level test (new value)'
+one-level test (new value)
+SELECT jsonb_diff($${
+  "a": 0,
+  "b": 1
+}$$, $${
+  "a": 0,
+  "b": 2
+}$$);
+ERROR:  function jsonb_diff(unknown, unknown) does not exist
+LINE 1: SELECT jsonb_diff($${
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+\echo 'one-level test (new type)'
+one-level test (new type)
+SELECT jsonb_diff($${
+  "a": 0,
+  "b": 1
+}$$, $${
+  "a": 0,
+  "b": true
+}$$);
+ERROR:  function jsonb_diff(unknown, unknown) does not exist
+LINE 1: SELECT jsonb_diff($${
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+\echo 'one-level test (new value and new type)'
+one-level test (new value and new type)
+SELECT jsonb_diff($${
+  "a": 0,
+  "b": 1
+}$$, $${
+  "a": 1,
+  "b": true
+}$$);
+ERROR:  function jsonb_diff(unknown, unknown) does not exist
+LINE 1: SELECT jsonb_diff($${
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
