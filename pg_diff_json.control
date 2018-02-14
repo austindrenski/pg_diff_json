@@ -1,3 +1,3 @@
-comment = 'PostgreSQL functions for differencing JSON and JSONB data'
+comment = 'PostgreSQL extension to provide differencing for the JSON and JSONB data types'
 default_version = '0.0.1'
 relocatable = true
