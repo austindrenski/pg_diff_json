@@ -5,7 +5,7 @@
 
 -- noinspection SqlUnused
 CREATE OR REPLACE FUNCTION _jsonb_diff(JSONB, JSONB, JSONB) RETURNS JSONB AS
-$$SELECT NULL :: JSONB$$ LANGUAGE SQL IMMUTABLE;
+$$SELECT NULL :: JSONB$$ LANGUAGE SQL IMMUTABLE STABLE;
 
 -- _jsonb_diff_primitives
 
@@ -16,7 +16,7 @@ SELECT CASE
        WHEN b IS NOT NULL THEN jsonb_build_object('type', '+', 'key', path, 'value', b)
        WHEN a IS NOT NULL THEN jsonb_build_object('type', '-', 'key', path)
        END;
-$_jsonb_diff_primitives$ LANGUAGE SQL IMMUTABLE;
+$_jsonb_diff_primitives$ LANGUAGE SQL IMMUTABLE STABLE;
 
 -- _jsonb_diff_objects
 
@@ -49,7 +49,7 @@ BEGIN
 
   RETURN changes;
 END;
-$_jsonb_diff_objects$ LANGUAGE plpgsql IMMUTABLE;
+$_jsonb_diff_objects$ LANGUAGE plpgsql IMMUTABLE STABLE;
 
 -- _jsonb_diff_arrays
 
@@ -82,7 +82,7 @@ BEGIN
 
   RETURN changes;
 END;
-$_jsonb_diff_arrays$ LANGUAGE plpgsql IMMUTABLE;
+$_jsonb_diff_arrays$ LANGUAGE plpgsql IMMUTABLE STABLE;
 
 -- _jsonb_diff
 
@@ -94,18 +94,18 @@ SELECT CASE
        WHEN jsonb_typeof(a) = 'array' THEN _jsonb_diff_arrays(path, a, b)
        ELSE _jsonb_diff_primitives(path, a, b)
        END;
-$_jsonb_diff$ LANGUAGE SQL IMMUTABLE;
+$_jsonb_diff$ LANGUAGE SQL IMMUTABLE STABLE;
 
 -- json_diff
 
 CREATE OR REPLACE FUNCTION json_diff(JSON, JSON) RETURNS JSON AS
 $json_diff$
 SELECT _jsonb_diff('[]' :: JSONB, $1 :: JSONB, $2 :: JSONB) :: JSON;
-$json_diff$ LANGUAGE SQL IMMUTABLE STRICT;
+$json_diff$ LANGUAGE SQL IMMUTABLE STRICT STABLE;
 
 -- jsonb_diff
 
 CREATE OR REPLACE FUNCTION jsonb_diff(JSONB, JSONB) RETURNS JSONB AS
 $jsonb_diff$
 SELECT _jsonb_diff('[]' :: JSONB, $1, $2);
-$jsonb_diff$ LANGUAGE SQL IMMUTABLE STRICT;
+$jsonb_diff$ LANGUAGE SQL IMMUTABLE STRICT STABLE;
