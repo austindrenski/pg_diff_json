@@ -18,125 +18,71 @@ SELECT CASE
        END;
 $_jsonb_diff_primitives$ LANGUAGE SQL IMMUTABLE;
 
--- _jsonb_diff_complex
+-- _jsonb_diff_objects
 
-CREATE OR REPLACE FUNCTION _jsonb_diff_complex(path JSONB, a JSONB, b JSONB) RETURNS JSONB AS
-$_jsonb_diff_complex$
-WITH
-    a_keys AS (
-      SELECT jsonb_object_keys(a) AS key
-  ),
-    b_keys AS (
-      SELECT jsonb_object_keys(b) AS key
-  ),
-    ab_keys AS (
-    SELECT key
-    FROM a_keys
-    UNION DISTINCT
-    SELECT key
-    FROM b_keys
-  ),
-    categorize AS (
-      SELECT
-        KEY,
-        CASE
-        WHEN EXISTS(SELECT 1
-                    FROM a_keys t
-                    WHERE t.key = KEY
-                    LIMIT 1)
-             AND
-             EXISTS(SELECT 1
-                    FROM b_keys t
-                    WHERE t.key = KEY
-                    LIMIT 1)
-          THEN 0
-        WHEN EXISTS(SELECT 1
-                    FROM a_keys t
-                    WHERE t.key = KEY
-                    LIMIT 1)
-          THEN 1
-        WHEN EXISTS(SELECT 1
-                    FROM b_keys t
-                    WHERE t.key = KEY
-                    LIMIT 1)
-          THEN 2
-        END AS CATEGORY
-      FROM ab_keys
-  )
-SELECT jsonb_agg(
-    CASE category
-    WHEN 0 THEN _jsonb_diff(path || to_jsonb(key), a -> key, b -> key)
-    WHEN 1 THEN jsonb_build_object('type', '-', 'key', path || to_jsonb(key))
-    WHEN 2 THEN jsonb_build_object('type', '+', 'key', path || to_jsonb(key), 'value', b -> key)
-    END)
-FROM categorize;
-$_jsonb_diff_complex$ LANGUAGE SQL IMMUTABLE;
+CREATE OR REPLACE FUNCTION _jsonb_diff_objects(path JSONB, a JSONB, b JSONB) RETURNS JSONB AS
+$_jsonb_diff_objects$
+DECLARE
+  changes JSONB = '[]';
+  a_keys  TEXT [];
+  b_keys  TEXT [];
+  key     TEXT;
+BEGIN
+  IF (a = b) THEN
+    RETURN changes;
+  END IF;
 
--- -- _jsonb_diff_objects
---
--- CREATE OR REPLACE FUNCTION _jsonb_diff_objects(path JSONB, a JSONB, b JSONB) RETURNS JSONB AS
--- $_jsonb_diff_objects$
--- DECLARE
---   changes JSONB = '[]';
---   a_keys  TEXT [];
---   b_keys  TEXT [];
---   key     TEXT;
--- BEGIN
---   IF (a = b) THEN
---     RETURN changes;
---   END IF;
---
---   a_keys := ARRAY(SELECT jsonb_object_keys(a));
---   b_keys := ARRAY(SELECT jsonb_object_keys(b));
---
---   FOR key IN SELECT unnest(a_keys) INTERSECT SELECT unnest(b_keys) LOOP
---     changes := changes || _jsonb_diff(path || to_jsonb(key), a -> key, b -> key);
---   END LOOP;
---
---   FOR key IN SELECT unnest(a_keys) EXCEPT SELECT unnest(b_keys) LOOP
---     changes := changes || jsonb_build_object('type', '-', 'key', path || to_jsonb(key));
---   END LOOP;
---
---   FOR key IN SELECT unnest(b_keys) EXCEPT SELECT unnest(a_keys) LOOP
---     changes := changes || jsonb_build_object('type', '+', 'key', path || to_jsonb(key), 'value', b -> key);
---   END LOOP;
---
---   RETURN changes;
--- END;
--- $_jsonb_diff_objects$ LANGUAGE plpgsql IMMUTABLE;
---
--- -- _jsonb_diff_arrays
---
--- CREATE OR REPLACE FUNCTION _jsonb_diff_arrays(path JSONB, a JSONB, b JSONB) RETURNS JSONB AS
--- $_jsonb_diff_arrays$
--- DECLARE
---   changes JSONB = '[]';
---   key     INTEGER;
---   a_keys  INTEGER [];
---   b_keys  INTEGER [];
--- BEGIN
---   IF (a = b) THEN
---     RETURN changes;
---   END IF;
---
---   a_keys := ARRAY(SELECT generate_series(0, jsonb_array_length(a) - 1));
---   b_keys := ARRAY(SELECT generate_series(0, jsonb_array_length(b) - 1));
---
---   FOR key IN SELECT unnest(a_keys) INTERSECT SELECT unnest(b_keys) LOOP
---     changes := changes || _jsonb_diff(path || to_jsonb(key), a -> key, b -> key);
---   END LOOP;
---
---   FOR key IN SELECT unnest(a_keys) EXCEPT SELECT unnest(b_keys) LOOP
---     changes := changes || jsonb_build_object('type', '-', 'key', path || to_jsonb(key));
---   END LOOP;
---
---   FOR key IN SELECT unnest(b_keys) EXCEPT SELECT unnest(a_keys) LOOP
---     changes := changes || jsonb_build_object('type', '+', 'key', path || to_jsonb(key), 'value', b -> key);
---   END LOOP;
---
---   RETURN changes;
--- END;
--- $_jsonb_diff_arrays$ LANGUAGE plpgsql IMMUTABLE;
+  a_keys := ARRAY(SELECT jsonb_object_keys(a));
+  b_keys := ARRAY(SELECT jsonb_object_keys(b));
+
+  FOR key IN SELECT unnest(a_keys) INTERSECT SELECT unnest(b_keys) LOOP
+    changes := changes || _jsonb_diff(path || to_jsonb(key), a -> key, b -> key);
+  END LOOP;
+
+  FOR key IN SELECT unnest(a_keys) EXCEPT SELECT unnest(b_keys) LOOP
+    changes := changes || jsonb_build_object('type', '-', 'key', path || to_jsonb(key));
+  END LOOP;
+
+  FOR key IN SELECT unnest(b_keys) EXCEPT SELECT unnest(a_keys) LOOP
+    changes := changes || jsonb_build_object('type', '+', 'key', path || to_jsonb(key), 'value', b -> key);
+  END LOOP;
+
+  RETURN changes;
+END;
+$_jsonb_diff_objects$ LANGUAGE plpgsql IMMUTABLE;
+
+-- _jsonb_diff_arrays
+
+CREATE OR REPLACE FUNCTION _jsonb_diff_arrays(path JSONB, a JSONB, b JSONB) RETURNS JSONB AS
+$_jsonb_diff_arrays$
+DECLARE
+  changes JSONB = '[]';
+  key     INTEGER;
+  a_keys  INTEGER [];
+  b_keys  INTEGER [];
+BEGIN
+  IF (a = b) THEN
+    RETURN changes;
+  END IF;
+
+  a_keys := ARRAY(SELECT generate_series(0, jsonb_array_length(a) - 1));
+  b_keys := ARRAY(SELECT generate_series(0, jsonb_array_length(b) - 1));
+
+  FOR key IN SELECT unnest(a_keys) INTERSECT SELECT unnest(b_keys) LOOP
+    changes := changes || _jsonb_diff(path || to_jsonb(key), a -> key, b -> key);
+  END LOOP;
+
+  FOR key IN SELECT unnest(a_keys) EXCEPT SELECT unnest(b_keys) LOOP
+    changes := changes || jsonb_build_object('type', '-', 'key', path || to_jsonb(key));
+  END LOOP;
+
+  FOR key IN SELECT unnest(b_keys) EXCEPT SELECT unnest(a_keys) LOOP
+    changes := changes || jsonb_build_object('type', '+', 'key', path || to_jsonb(key), 'value', b -> key);
+  END LOOP;
+
+  RETURN changes;
+END;
+$_jsonb_diff_arrays$ LANGUAGE plpgsql IMMUTABLE;
 
 -- _jsonb_diff
 
@@ -144,8 +90,8 @@ CREATE OR REPLACE FUNCTION _jsonb_diff(path JSONB, a JSONB, b JSONB) RETURNS JSO
 $_jsonb_diff$
 SELECT CASE
        WHEN a = b THEN '[]' :: JSONB
-       WHEN jsonb_typeof(a) = 'object' THEN _jsonb_diff_complex(path, a, b)
-       WHEN jsonb_typeof(a) = 'array' THEN _jsonb_diff_complex(path, a, b)
+       WHEN jsonb_typeof(a) = 'object' THEN _jsonb_diff_objects(path, a, b)
+       WHEN jsonb_typeof(a) = 'array' THEN _jsonb_diff_arrays(path, a, b)
        ELSE _jsonb_diff_primitives(path, a, b)
        END;
 $_jsonb_diff$ LANGUAGE SQL IMMUTABLE;
