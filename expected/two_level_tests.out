@@ -2,7 +2,7 @@
 
 \echo 'two-level test (identity)'
 two-level test (identity)
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -15,14 +15,15 @@ SELECT jsonb_diff($${
     "d": true
   }
 }$$);
-ERROR:  function jsonb_diff(unknown, unknown) does not exist
-LINE 1: SELECT jsonb_diff($${
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+ diff_jsonb 
+------------
+ 
+(1 row)
+
 
 \echo 'two-level test (delete)'
 two-level test (delete)
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -34,14 +35,15 @@ SELECT jsonb_diff($${
     "c": 2
   }
 }$$);
-ERROR:  function jsonb_diff(unknown, unknown) does not exist
-LINE 1: SELECT jsonb_diff($${
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+     diff_jsonb     
+--------------------
+ {"(-,\"{b,d}\",)"}
+(1 row)
+
 
 \echo 'two-level test (full delete)'
 two-level test (full delete)
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -50,14 +52,15 @@ SELECT jsonb_diff($${
 }$$, $${
   "a": 0
 }$$);
-ERROR:  function jsonb_diff(unknown, unknown) does not exist
-LINE 1: SELECT jsonb_diff($${
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+  diff_jsonb  
+--------------
+ {"(-,{b},)"}
+(1 row)
+
 
 \echo 'two-level test (new value)'
 two-level test (new value)
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -70,14 +73,15 @@ SELECT jsonb_diff($${
     "d": false
   }
 }$$);
-ERROR:  function jsonb_diff(unknown, unknown) does not exist
-LINE 1: SELECT jsonb_diff($${
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+       diff_jsonb        
+-------------------------
+ {"(+,\"{b,d}\",false)"}
+(1 row)
+
 
 \echo 'two-level test (new type)'
 two-level test (new type)
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -90,14 +94,15 @@ SELECT jsonb_diff($${
     "d": 3
   }
 }$$);
-ERROR:  function jsonb_diff(unknown, unknown) does not exist
-LINE 1: SELECT jsonb_diff($${
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+     diff_jsonb      
+---------------------
+ {"(+,\"{b,d}\",3)"}
+(1 row)
+
 
 \echo 'two-level test (new value and new type)'
 two-level test (new value and new type)
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -110,14 +115,15 @@ SELECT jsonb_diff($${
     "d": 3
   }
 }$$);
-ERROR:  function jsonb_diff(unknown, unknown) does not exist
-LINE 1: SELECT jsonb_diff($${
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+                diff_jsonb                
+------------------------------------------
+ {"(+,\"{b,c}\",true)","(+,\"{b,d}\",3)"}
+(1 row)
+
 
 \echo 'two-level test (new value and new type, multilevel)'
 two-level test (new value and new type, multilevel)
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -130,7 +136,8 @@ SELECT jsonb_diff($${
     "d": true
   }
 }$$);
-ERROR:  function jsonb_diff(unknown, unknown) does not exist
-LINE 1: SELECT jsonb_diff($${
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+  diff_jsonb   
+---------------
+ {"(+,{a},1)"}
+(1 row)
+

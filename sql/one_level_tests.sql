@@ -1,7 +1,9 @@
+CREATE EXTENSION pg_diff_json;
+
 -- one-level tests
 
 \echo 'one-level test (identity)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": 1
 }$$, $${
@@ -10,7 +12,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'one-level test (delete)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": 1
 }$$, $${
@@ -18,7 +20,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'one-level test (new value)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": 1
 }$$, $${
@@ -27,7 +29,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'one-level test (new type)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": 1
 }$$, $${
@@ -36,7 +38,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'one-level test (new value and new type)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": 1
 }$$, $${

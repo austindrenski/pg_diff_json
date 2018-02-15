@@ -1,7 +1,7 @@
 -- two-level tests
 
 \echo 'two-level test (identity)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -16,7 +16,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'two-level test (delete)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -30,7 +30,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'two-level test (full delete)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -41,7 +41,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'two-level test (new value)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -56,7 +56,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'two-level test (new type)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -71,7 +71,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'two-level test (new value and new type)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,
@@ -86,7 +86,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'two-level test (new value and new type, multilevel)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": {
     "c": 2,

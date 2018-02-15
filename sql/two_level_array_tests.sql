@@ -1,7 +1,7 @@
 -- two-level array tests
 
 \echo 'two-level array test (identity)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": [
     0,
@@ -18,7 +18,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'two-level array test (delete)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": [
     0,
@@ -34,7 +34,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'two-level array test (full delete)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": [
     0,
@@ -46,7 +46,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'two-level array test (new value)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": [
     0,
@@ -63,7 +63,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'two-level array test (new type)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": [
     0,
@@ -80,7 +80,7 @@ SELECT jsonb_diff($${
 }$$);
 
 \echo 'two-level test (new value and new type, multilevel)'
-SELECT jsonb_diff($${
+SELECT diff_jsonb($${
   "a": 0,
   "b": [
     0,
