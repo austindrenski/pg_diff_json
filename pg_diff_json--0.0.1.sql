@@ -41,6 +41,12 @@ BEGIN
   IF (a = b) THEN
     RETURN changes;
   END IF;
+  IF (a IS NULL) THEN
+    RETURN ARRAY [('+', NULL, b) :: CHANGESET];
+  END IF;
+  IF (b IS NULL) THEN
+    RETURN ARRAY [('-', NULL, NULL) :: CHANGESET];
+  END IF;
 
   a_keys := ARRAY(SELECT jsonb_object_keys(a));
   b_keys := ARRAY(SELECT jsonb_object_keys(b));
