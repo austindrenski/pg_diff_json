@@ -22,7 +22,7 @@ $$SELECT NULL :: CHANGESET []$$ LANGUAGE SQL IMMUTABLE;
 CREATE OR REPLACE FUNCTION _diff_jsonb_primitives(path TEXT [], a JSONB, b JSONB) RETURNS CHANGESET [] AS
 $_diff_jsonb_primitives$
 SELECT CASE
-       WHEN a = b THEN NULL
+       WHEN a = b THEN ARRAY [] :: CHANGESET []
        WHEN b IS NOT NULL THEN ARRAY [('+', path, b) :: CHANGESET]
        WHEN a IS NOT NULL THEN ARRAY [('-', path, NULL) :: CHANGESET]
        END;
@@ -105,7 +105,7 @@ $_diff_jsonb_arrays$ LANGUAGE plpgsql IMMUTABLE;
 CREATE OR REPLACE FUNCTION _diff_jsonb(path TEXT [], a JSONB, b JSONB) RETURNS CHANGESET [] AS
 $_diff_jsonb$
 SELECT CASE
-       WHEN a = b THEN NULL
+       WHEN a = b THEN ARRAY [] :: CHANGESET []
        WHEN jsonb_typeof(a) = 'object' THEN _diff_jsonb_objects(path, a, b)
        WHEN jsonb_typeof(a) = 'array' THEN _diff_jsonb_arrays(path, a, b)
        ELSE _diff_jsonb_primitives(path, a, b)

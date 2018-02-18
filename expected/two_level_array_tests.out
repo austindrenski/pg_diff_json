@@ -19,7 +19,7 @@ SELECT diff_jsonb($${
 }$$);
  diff_jsonb 
 ------------
- 
+ {}
 (1 row)
 
 
